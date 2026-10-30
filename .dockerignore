@@ -1,0 +1,9 @@
+node_modules
+.env
+.env.*
+.qloo
+private
+evidence-private
+test
+*.log
+.git

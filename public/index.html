@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Realove Connection Lab: explore cultural interests and practise respectful conversation. A standalone hackathon prototype with Qloo and Nebius.">
+  <meta name="theme-color" content="#f8f3eb">
+  <title>Realove Connection Lab</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Skip to the demo</a>
+  <header class="site-header wrap">
+    <a class="brand" href="https://realove.io" target="_blank" rel="noopener noreferrer" aria-label="Realove website, opens in a new tab">
+      <img src="/assets/realove-logo-approved.jpg" alt="Realove" width="68" height="68">
+      <span class="brand-name">Connection Lab<span>A Realove exploration</span></span>
+    </a>
+    <span class="prototype-badge"><span aria-hidden="true"></span>Standalone hackathon prototype</span>
+  </header>
+  <main class="wrap">
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="eyebrow">A little curiosity. A more thoughtful connection.</p>
+      <h1 id="hero-title">Good connections begin<br>with a <em>real conversation.</em></h1>
+      <p class="hero-copy">Realove helps single adults communicate respectfully and build healthy relationships, online and offline. Explore a shared interest, or practise finding the words.</p>
+      <p class="prototype-note">This lab is a separate demonstration. Venus V2, Realove’s AI superconnector and matchmaker, is still in development.</p>
+    </section>
+
+    <section id="workspace" class="workspace" aria-label="Connection Lab demonstrations">
+      <div class="tabs" role="tablist" aria-label="Choose a demonstration">
+        <button id="tab-culture" class="tab active" type="button" role="tab" aria-selected="true" aria-controls="panel-culture" data-tab="culture"><span class="tab-number">01</span><span>Find shared ground<small>Culture into conversation</small></span><span class="tab-provider">Qloo</span></button>
+        <button id="tab-practice" class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel-practice" tabindex="-1" data-tab="practice"><span class="tab-number">02</span><span>Find your words<small>Respectful conversation practice</small></span><span class="tab-provider">Nebius · NVIDIA</span></button>
+      </div>
+
+      <div id="panel-culture" class="tab-panel" role="tabpanel" aria-labelledby="tab-culture">
+        <div class="work-grid">
+          <div class="flow-main">
+            <div class="section-heading"><span class="step-pill">START WITH CURIOSITY</span><span id="qloo-status" class="provider-status" data-state="checking"><span aria-hidden="true"></span>Checking Qloo access</span></div>
+            <h2>What do you enjoy?</h2>
+            <p class="section-copy">Choose up to three music, film or book interests. Check the matches before asking Qloo to explore related culture.</p>
+            <form id="culture-form" novalidate>
+              <label for="concepts">Your cultural interests<span class="label-help">One per line, up to three</span></label>
+              <textarea id="concepts" name="concepts" rows="3" maxlength="360" placeholder="Nina Simone&#10;Spirited Away&#10;The Little Prince" aria-describedby="concept-help"></textarea>
+              <p id="concept-help" class="field-hint">Use public cultural references, not a person’s name or private profile.</p>
+              <button type="button" class="preset" id="culture-example"><span aria-hidden="true">↗</span> Try a fictional demo selection</button>
+              <div class="form-actions"><button class="button button-primary" id="resolve-button" type="submit">Find these interests <span aria-hidden="true">→</span></button><span class="request-note">Live Qloo lookup</span></div>
+            </form>
+            <div id="culture-feedback" class="feedback" role="status" aria-live="polite" hidden></div>
+            <section id="confirmation-section" class="confirmation-section" aria-labelledby="confirm-heading" hidden>
+              <div class="section-divider"></div>
+              <span class="step-pill">YOU CONFIRM THE CONTEXT</span>
+              <h3 id="confirm-heading">Did we find the right interests?</h3>
+              <p class="field-hint">These are Qloo’s search results. Choose the intended result for each interest.</p>
+              <div id="entity-groups"></div>
+              <label class="check-row"><input type="checkbox" id="confirm-entities"><span>I have checked the selected interests and want to use them for this request.</span></label>
+              <div class="goal-field"><label for="culture-goal">What would you like to explore?</label><select id="culture-goal"><option value="conversation">Something to talk about</option><option value="activity">An activity to explore together</option></select></div>
+              <button type="button" class="button button-primary" id="plan-button" disabled>Explore shared ground <span aria-hidden="true">→</span></button>
+            </section>
+          </div>
+          <aside class="flow-aside" aria-label="About cultural exploration">
+            <div class="aside-heading"><span class="tiny-line" aria-hidden="true"></span>A bridge, not a prediction</div>
+            <div class="connection-map" aria-hidden="true"><span>What you enjoy</span><i></i><span>Related culture</span><i></i><span class="map-final">Your next conversation</span></div>
+            <p>Interests can open a conversation. They cannot tell us whether two people belong together.</p>
+            <ul class="principles"><li>You choose what to share</li><li>You confirm the search results</li><li>You decide what to do next</li></ul>
+            <div class="aside-footnote">No compatibility score. No personal profiles. No automated introductions.</div>
+          </aside>
+        </div>
+        <section id="culture-results" class="results-section" aria-labelledby="culture-results-heading" hidden>
+          <div class="results-top"><div><span class="step-pill">A POSSIBLE STARTING POINT</span><h2 id="culture-results-heading">Follow your curiosity.</h2></div><span class="source-tag">Retrieved from Qloo</span></div>
+          <p id="culture-result-context" class="section-copy"></p>
+          <div id="recommendation-grid" class="recommendation-grid"></div>
+          <div id="starter-section" class="starter-section" hidden><h3>Choose a conversation starter</h3><p class="field-hint">These are optional templates based on the retrieved cultural references. They are not messages from another person.</p><div id="starter-list" class="starter-list"></div><div id="starter-preview" class="draft-preview" hidden><span class="draft-label">YOUR SELECTED STARTER</span><p id="starter-text"></p><button type="button" id="copy-starter" class="button button-secondary">Copy selected starter</button></div></div>
+          <p id="culture-provenance" class="provenance"></p>
+          <p class="result-limit">Cultural recommendations are possibilities to explore, not evidence of romantic compatibility.</p>
+        </section>
+      </div>
+
+      <div id="panel-practice" class="tab-panel" role="tabpanel" aria-labelledby="tab-practice" hidden>
+        <div class="work-grid">
+          <div class="flow-main">
+            <div class="section-heading"><span class="step-pill">A LITTLE SPACE TO REHEARSE</span><span id="nebius-status" class="provider-status" data-state="checking"><span aria-hidden="true"></span>Checking Nebius access</span></div>
+            <h2>Say it with care.</h2>
+            <p class="section-copy">Practise an introduction, a boundary or a difficult moment. The model offers wording; the decision stays with you.</p>
+            <form id="coach-form" novalidate>
+              <label for="coach-goal">What would you like help with?</label>
+              <select id="coach-goal"><option value="introduction">A warm introduction</option><option value="boundary">Expressing a boundary</option><option value="deescalation">A calmer disagreement</option></select>
+              <label for="coach-message" class="spaced-label">A fictional message or situation</label>
+              <textarea id="coach-message" rows="5" maxlength="1200" placeholder="I enjoy getting to know you, but I would prefer not to share my phone number yet." aria-describedby="coach-help"></textarea>
+              <div class="field-bottom"><p id="coach-help" class="field-hint">Use fictional examples. Leave out names, contact details and private messages.</p><span id="coach-count" class="character-count">0 / 1200</span></div>
+              <div class="preset-row"><button type="button" class="preset" data-coach-example="introduction">Try an introduction</button><button type="button" class="preset" data-coach-example="boundary">Try a boundary</button><button type="button" class="preset" data-coach-example="deescalation">Try a disagreement</button></div>
+              <div class="form-actions"><button id="coach-button" class="button button-primary" type="submit">Practise this conversation <span aria-hidden="true">→</span></button><span class="request-note">Live NVIDIA model on Nebius</span></div>
+            </form>
+            <div id="coach-feedback" class="feedback" role="status" aria-live="polite" hidden></div>
+          </div>
+          <aside class="flow-aside practice-aside" aria-label="About conversation practice">
+            <div class="aside-heading"><span class="tiny-line" aria-hidden="true"></span>Your voice stays yours</div>
+            <blockquote>“A thoughtful message leaves room for the other person.”</blockquote>
+            <p>A rehearsal can help you choose your words. It does not reveal what someone else thinks or feels.</p>
+            <ul class="principles"><li>No assumptions about their intentions</li><li>Boundaries are worth respecting</li><li>Every draft needs your review</li></ul>
+            <div class="aside-footnote">The lab cannot send messages. It is conversation practice, not professional advice.</div>
+          </aside>
+        </div>
+        <section id="coach-results" class="results-section" aria-labelledby="coach-results-heading" hidden>
+          <div class="results-top"><div><span class="step-pill">ROOM FOR YOUR OWN VOICE</span><h2 id="coach-results-heading">A draft to make your own.</h2></div><span class="source-tag">NVIDIA model · Nebius</span></div>
+          <div class="draft-preview coach-draft"><span class="draft-label">OPTIONAL WORDING</span><p id="coach-draft"></p></div>
+          <div id="coach-notes" class="coach-notes" hidden></div>
+          <label class="check-row review-row"><input id="approve-draft" type="checkbox"><span>I have reviewed this draft. I will decide whether to change it or use it.</span></label>
+          <button type="button" id="copy-coach" class="button button-secondary" disabled>Copy reviewed draft</button>
+          <p id="coach-provenance" class="provenance"></p>
+          <p class="result-limit">This is AI-generated practice. It may miss context or get things wrong. Nothing is sent to another person.</p>
+        </section>
+      </div>
+    </section>
+    <div id="copy-feedback" class="copy-toast" role="status" aria-live="polite" hidden></div>
+    <section class="lab-note" aria-label="About this prototype"><span class="lab-note-mark" aria-hidden="true">✳</span><div><strong>Connection is something people choose.</strong><p>This standalone lab uses only the demonstration inputs you enter. It has no access to Realove accounts or conversations. It is an experiment for adults, not the released Venus V2 product.</p></div></section>
+  </main>
+  <footer class="site-footer wrap"><span>Realove Connection Lab · 2026</span><a href="https://realove.io" target="_blank" rel="noopener noreferrer">Explore Realove <span aria-hidden="true">↗</span></a><button type="button" id="refresh-status">Refresh connection status</button></footer>
+</body>
+</html>

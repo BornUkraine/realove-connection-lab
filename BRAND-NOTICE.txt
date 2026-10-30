@@ -1,0 +1,4 @@
+Realove and the original approved full-wordmark logo belong to Yevhen Donin.
+The approved image is reproduced unchanged for this Realove demonstration.
+The MIT code license does not grant trademark or brand endorsement rights.
+The app can run without the optional logo image.

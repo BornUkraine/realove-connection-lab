@@ -1,0 +1,14 @@
+{
+  "name": "realove-connection-lab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "An isolated, consent-first cultural connection and communication rehearsal demo.",
+  "type": "module",
+  "engines": { "node": ">=22.19.0" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "qloo:help": "qloo --help"
+  },
+  "dependencies": { "@qloo/qloo-harness": "0.1.26" }
+}
