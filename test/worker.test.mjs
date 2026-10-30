@@ -48,7 +48,7 @@ test('Worker cultural flow preserves confirmation across isolates and uses verif
   const data = await resolve.json(); assert.equal(data.needsConfirmation, true); assert.equal(data.groups[0].candidates[0].type, 'urn:entity:artist');
   assert.equal(calls[0].url.origin, 'https://hackathon.api.qloo.com'); assert.equal(calls[0].url.pathname, '/search');
   assert.equal(calls[0].url.searchParams.get('query'), 'The Beatles'); assert.equal(calls[0].url.searchParams.get('take'), '6');
-  assert.equal(calls[0].options.headers['X-Api-Key'], env.QLOO_API_KEY); assert.equal(calls[0].url.href.includes(env.QLOO_API_KEY), false); assert.equal(calls[0].options.redirect, 'error');
+  assert.equal(calls[0].options.headers['X-Api-Key'], env.QLOO_API_KEY); assert.equal(calls[0].url.href.includes(env.QLOO_API_KEY), false); assert.equal(calls[0].options.redirect, 'manual');
   const second = createWorkerHandler({ fetchImpl: fakeApi(calls) });
   const planInput = { resolutionId: data.resolutionId, entities: [{ id: 'CULTURE-ENTITY-001', name: 'UNTRUSTED CLIENT NAME' }], confirmed: true, goal: 'conversation' };
   const result = await second.fetch(req('/api/qloo/plan', planInput), env); const plan = await result.json();
@@ -85,6 +85,31 @@ test('Worker provider failures and redirects cannot leak credentials', async () 
   const invalid = new QlooRestAdapter({ env: { ...env, QLOO_BASE_URL: 'https://attacker.example' }, fetchImpl: () => assert.fail('must not send key') });
   await assert.rejects(() => invalid.search('Public film'), error => error.code === 'QLOO_NOT_CONFIGURED');
 });
+test('Worker-compatible manual redirects stop both providers before any credential forwarding', async () => {
+  for (const status of [300, 301, 302, 303, 307, 308, 399]) {
+    for (const [path, input, code, allowedOrigin, secret] of [
+      ['/api/qloo/resolve', { concepts: ['Public film'] }, 'QLOO_REDIRECT', 'https://hackathon.api.qloo.com', env.QLOO_API_KEY],
+      ['/api/coach', { message: 'A fictional introduction.', goal: 'introduction' }, 'NEBIUS_REDIRECT', 'https://api.tokenfactory.nebius.com', env.NEBIUS_API_KEY],
+    ]) {
+      const calls = [];
+      const location = `https://redirect.invalid/collect?credential=${secret}`;
+      const worker = createWorkerHandler({ fetchImpl: async (url, options) => {
+        // Cloudflare rejects the standard 'error' mode before making a request.
+        if (options.redirect === 'error') throw new TypeError('Unsupported redirect mode: error');
+        assert.equal(options.redirect, 'manual');
+        calls.push({ url: new URL(url), options });
+        return new Response(`Untrusted provider response ${secret}`, { status, headers: { Location: location } });
+      } });
+      const result = await worker.fetch(req(path, input), env);
+      const output = await result.text();
+      assert.equal(result.status, 502);
+      assert.equal(JSON.parse(output).error.code, code);
+      assert.equal(calls.length, 1, 'never follow a credential-bearing redirect');
+      assert.equal(calls[0].url.origin, allowedOrigin);
+      for (const value of [secret, location, 'redirect.invalid', 'Untrusted provider response']) assert.equal(output.includes(value), false);
+    }
+  }
+});
 test('Worker request limits and external limiter fail closed', async () => {
   const worker = createWorkerHandler({ fetchImpl: fakeApi() });
   assert.equal((await worker.fetch(req('/api/qloo/resolve', { concepts: ['Public film'] }), { ...env, RATE_LIMITER: { limit: async () => ({ success: false }) } })).status, 429);
@@ -104,6 +129,8 @@ test('portable providers preserve the global receiver and work without AbortSign
     let requests = 0;
     async function receiverSensitiveFetch(url, options) {
       assert.equal(this, globalThis, 'Workers native fetch must receive the global receiver');
+      if (options.redirect === 'error') throw new TypeError('Unsupported redirect mode: error');
+      assert.equal(options.redirect, 'manual');
       assert.ok(options.signal instanceof AbortSignal); requests += 1;
       return new URL(url).pathname === '/search' ? Response.json({ results: [entity] }) : Response.json({ choices: [{ message: { content: 'A respectful fictional draft.' } }] });
     }
